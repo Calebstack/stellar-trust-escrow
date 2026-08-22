@@ -12,6 +12,7 @@ import compressionMiddleware from './middleware/compression.js';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import { helmetOptions, permissionsPolicyMiddleware } from './config/helmetOptions.js';
 import { requestLogger } from './lib/logger.js';
 
 import cookieParser from 'cookie-parser';
@@ -97,7 +98,8 @@ const sentryErrorHandler =
 // Attaches trace context and request data to every event captured downstream.
 app.use(sentryRequestHandler);
 
-app.use(helmet());
+app.use(helmet(helmetOptions));
+app.use(permissionsPolicyMiddleware);
 app.use(compressionMiddleware);
 app.use(metricsMiddleware);
 app.use(responseTime);
