@@ -62,7 +62,7 @@ jobs:
 
       - name: Generate TypeScript SDK
         run: |
-          swagger-typescript-api -p backend/openapi.yaml -o frontend/lib/api-client -n api.ts --modular
+          swagger-typescript-api generate -p backend/openapi.yaml -o frontend/lib/api-client -n api.ts --modular
 
       - name: Check SDK compilation
         run: cd frontend && npm install && npx tsc --noEmit
