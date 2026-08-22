@@ -468,7 +468,7 @@ jobs:
 
       - name: Run Playwright suite
         if: steps.changes.outputs.changed == 'true'
-        run: npm run test:e2e -w frontend -- --update-snapshots
+        run: npm run test:e2e -w frontend
         env:
           CI: 'true'
           NEXT_PUBLIC_API_URL: http://127.0.0.1:4000
