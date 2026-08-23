@@ -79,6 +79,8 @@ import { syncFromPrisma, ensureIndex } from './services/reputationSearchService.
 import { createGateway } from './gateway/index.js';
 import queueDashboardRoutes from './api/routes/queueDashboardRoutes.js';
 import chatRoutes from './api/routes/chatRoutes.js';
+import streamRoutes from './api/routes/streamRoutes.js';
+import { startIndexer as startStreamingIndexer } from './services/streamingIndexer.js';
 import { startAnalyticsWorker } from './workers/analyticsWorker.js';
 import { startPriceOracleWorker } from './workers/priceOracleWorker.js';
 
@@ -239,6 +241,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/v1/templates', templateRoutes);
 app.use('/api/insurance', insuranceRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/v1/streams', streamRoutes);
 app.use('/metrics', metricsRoutes);
 app.use('/admin/queues', queueDashboardRoutes);
 app.use('/.well-known', wellKnownRoutes);
@@ -361,6 +364,10 @@ async function startServer() {
         startIndexer().catch((err) => {
           logger.error({ err, component: 'indexer' }, 'Indexer failed to start');
           Sentry.captureException(err, { tags: { component: 'indexer' } });
+        });
+        startStreamingIndexer().catch((err) => {
+          logger.error({ err, component: 'streaming-indexer' }, 'Streaming indexer failed to start');
+          Sentry.captureException(err, { tags: { component: 'streaming-indexer' } });
         });
         startRpcMonitor();
 
