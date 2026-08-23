@@ -27,7 +27,7 @@ export async function up(prisma) {
       referrer_user_id  INTEGER NOT NULL,
       total_referrals   INTEGER NOT NULL DEFAULT 0,
       total_earned_xlm  DECIMAL(20,7) NOT NULL DEFAULT 0,
-      created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
       CONSTRAINT fk_referral_code_user FOREIGN KEY (referrer_user_id) REFERENCES users(id) ON DELETE CASCADE
     )
@@ -41,11 +41,11 @@ export async function up(prisma) {
       triggered_by_event  "ReferralTriggerEvent" NOT NULL,
       earned_xlm          DECIMAL(20,7) NOT NULL,
       paid_out            BOOLEAN NOT NULL DEFAULT FALSE,
-      paid_out_at         TIMESTAMPTZ,
-      created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      paid_out_at         TIMESTAMP,
+      created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
       CONSTRAINT fk_referral_earning_code FOREIGN KEY (referral_code) REFERENCES referral_codes(code) ON DELETE CASCADE,
-      CONSTRAINT uq_referral_earning UNIQUE (referral_code, escrow_id, triggered_by_event)
+      CONSTRAINT referral_earnings_referral_code_escrow_id_triggered_by_even_key UNIQUE (referral_code, escrow_id, triggered_by_event)
     )
   `);
 
