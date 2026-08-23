@@ -105,14 +105,7 @@ fn create_stream(
     env.mock_all_auths();
 
     let client = StreamingPaymentContractClient::new(env, &stream_contract);
-    let stream_id = client.create_stream(
-        sender,
-        recipient,
-        token,
-        &total_amount,
-        &rate,
-        &start_at,
-    );
+    let stream_id = client.create_stream(sender, recipient, token, &total_amount, &rate, &start_at);
 
     (stream_contract, stream_id)
 }
@@ -269,7 +262,10 @@ fn test_cancel_splits_correctly() {
     assert_eq!(recipient_bal, 30 * RATE_PRECISION);
 
     let sender_bal = token_client.balance(&sender);
-    assert_eq!(sender_bal, 1_000_000_000_000 - total + (total - 30 * RATE_PRECISION));
+    assert_eq!(
+        sender_bal,
+        1_000_000_000_000 - total + (total - 30 * RATE_PRECISION)
+    );
 }
 
 #[test]

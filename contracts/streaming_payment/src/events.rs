@@ -44,28 +44,18 @@ pub fn emit_stream_claimed(
 }
 
 pub fn emit_stream_paused(env: &Env, stream_id: u64) {
-    env.events()
-        .publish((STREAM_PAUSED, stream_id), ());
+    env.events().publish((STREAM_PAUSED, stream_id), ());
 }
 
 pub fn emit_stream_resumed(env: &Env, stream_id: u64) {
-    env.events()
-        .publish((STREAM_RESUMED, stream_id), ());
+    env.events().publish((STREAM_RESUMED, stream_id), ());
 }
 
-pub fn emit_stream_cancelled(
-    env: &Env,
-    stream_id: u64,
-    to_recipient: i128,
-    to_sender: i128,
-) {
-    env.events().publish(
-        (STREAM_CANCELLED, stream_id),
-        (to_recipient, to_sender),
-    );
+pub fn emit_stream_cancelled(env: &Env, stream_id: u64, to_recipient: i128, to_sender: i128) {
+    env.events()
+        .publish((STREAM_CANCELLED, stream_id), (to_recipient, to_sender));
 }
 
 pub fn emit_stream_drained(env: &Env, stream_id: u64) {
-    env.events()
-        .publish((STREAM_DRAINED, stream_id), ());
+    env.events().publish((STREAM_DRAINED, stream_id), ());
 }

@@ -4,17 +4,24 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 const RATE_PRECISION = 10_000_000;
 
+interface StreamAccrualInput {
+  ratePerSecond: string | number;
+  remainingBalance: string | number;
+  totalAmount: string | number;
+  startAt: string | number;
+  lastClaimedAt?: string | number;
+  status: string;
+  paused?: boolean;
+}
+
 /**
  * Hook that provides a live-updating accrued balance for a payment stream.
  * Uses requestAnimationFrame for smooth 60fps animation without polling.
- *
- * @param {Object} stream - Stream data with ratePerSecond, lastClaimTime, startAt, remainingBalance, status, paused
- * @returns {{ accrued: string, progress: number }}
  */
-export function useStreamAccrual(stream) {
+export function useStreamAccrual(stream: StreamAccrualInput | null | undefined) {
   const [accrued, setAccrued] = useState('0');
   const [progress, setProgress] = useState(0);
-  const rafRef = useRef(null);
+  const rafRef = useRef<number | null>(null);
   const lastValueRef = useRef(0);
 
   const computeAccrued = useCallback(() => {

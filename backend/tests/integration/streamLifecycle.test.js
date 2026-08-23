@@ -18,10 +18,15 @@ jest.unstable_mockModule('../../lib/prisma.js', () => ({ default: prismaMock }))
 const stellarSdkMock = {
   SorobanRpc: {
     Server: jest.fn(() => ({
-      getAccount: jest.fn(),
-      simulateTransaction: jest.fn(),
+      getAccount: jest.fn().mockResolvedValue({ accountId: () => 'recipient_g' }),
+      simulateTransaction: jest.fn().mockResolvedValue({ result: {} }),
     })),
     isSimulationError: jest.fn(() => false),
+    assembleTransaction: jest.fn(() => ({
+      build: jest.fn(() => ({
+        toXDR: jest.fn(() => 'mock_xdr_base64'),
+      })),
+    })),
   },
   TransactionBuilder: jest.fn(() => ({
     addOperation: jest.fn().mockReturnThis(),
@@ -49,7 +54,7 @@ jest.unstable_mockModule('../../config/logger.js', () => ({
   logControllerError: jest.fn(),
 }));
 
-jest.unstable_mockModule('../../middleware/auth.js', () => ({
+jest.unstable_mockModule('../../api/middleware/auth.js', () => ({
   default: (req, res, next) => {
     req.user = { walletAddress: req.headers['x-wallet-address'] || 'user123' };
     next();
@@ -57,6 +62,10 @@ jest.unstable_mockModule('../../middleware/auth.js', () => ({
 }));
 
 // ── Import ────────────────────────────────────────────────────────────────────
+
+// streamController.js reads STREAMING_CONTRACT_ID at module-load time, so it
+// must be set before the controller is imported below.
+process.env.STREAMING_CONTRACT_ID = 'CSTREAMTESTCONTRACTID';
 
 const express = (await import('express')).default;
 const streamRoutes = (await import('../../api/routes/streamRoutes.js')).default;

@@ -10,7 +10,7 @@ const COMMON_TOKENS = [
   { label: 'XLM', address: 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVSNYHQ2WTHASPFTKEJ7ICIRXXWJ' },
 ];
 
-function formatDuration(totalSeconds) {
+function formatDuration(totalSeconds: number | null) {
   if (!totalSeconds || totalSeconds <= 0) return 'N/A';
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -24,7 +24,11 @@ function formatDuration(totalSeconds) {
   return parts.join(' ');
 }
 
-export default function StreamCreateForm({ onCreated }) {
+interface StreamCreateFormProps {
+  onCreated?: () => void;
+}
+
+export default function StreamCreateForm({ onCreated }: StreamCreateFormProps) {
   const [recipient, setRecipient] = useState('');
   const [tokenAddress, setTokenAddress] = useState(COMMON_TOKENS[0].address);
   const [totalAmount, setTotalAmount] = useState('');
@@ -46,21 +50,21 @@ export default function StreamCreateForm({ onCreated }) {
     return (amount / rate) * 3600;
   }, [totalAmount, ratePerHour]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+      const sdk: any = await import('@stellar/stellar-sdk');
       const {
         SorobanRpc,
         TransactionBuilder,
         Contract,
         Address,
         nativeToScVal,
-        xdr,
         BASE_FEE,
-      } = await import('@stellar/stellar-sdk');
+      } = sdk;
       const { signWithFreighter } = await import('../../lib/soroban');
 
       const NETWORK = process.env.NEXT_PUBLIC_STELLAR_NETWORK || 'testnet';
@@ -72,10 +76,11 @@ export default function StreamCreateForm({ onCreated }) {
           : 'Test SDF Network ; September 2015';
 
       if (!CONTRACT) throw new Error('Streaming contract address not configured');
+      if (!ratePerSecond) throw new Error('Invalid rate');
 
       const server = new SorobanRpc.Server(RPC_URL);
-      const { freightsApi } = await import('@stellar/freighter-api');
-      const address = await freightsApi.getAddress();
+      const { getPublicKey } = await import('@stellar/freighter-api');
+      const address = await getPublicKey();
       const account = await server.getAccount(address);
       const contract = new Contract(CONTRACT);
 
@@ -123,7 +128,7 @@ export default function StreamCreateForm({ onCreated }) {
       setRatePerHour('');
       onCreated?.();
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }

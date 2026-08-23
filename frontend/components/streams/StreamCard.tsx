@@ -8,7 +8,7 @@ import { truncateAddress } from '../../lib/stellar';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 const RATE_PRECISION = 10_000_000;
 
-function formatTokenAmount(amount, decimals = 7) {
+function formatTokenAmount(amount: string | number, decimals = 7) {
   const num = Number(amount);
   if (!num) return '0';
   const formatted = num / RATE_PRECISION;
@@ -18,7 +18,7 @@ function formatTokenAmount(amount, decimals = 7) {
   });
 }
 
-function formatRate(ratePerSecond) {
+function formatRate(ratePerSecond: string | number) {
   const num = Number(ratePerSecond);
   if (!num) return '0';
   const tokensPerSec = num / RATE_PRECISION;
@@ -27,7 +27,26 @@ function formatRate(ratePerSecond) {
   return `${tokensPerSec.toFixed(2)} tok/sec`;
 }
 
-export default function StreamCard({ stream, role, onAction }) {
+interface Stream {
+  streamId: string | number;
+  senderAddress: string;
+  recipientAddress: string;
+  status: string;
+  ratePerSecond: string | number;
+  totalAmount: string | number;
+  remainingBalance: string | number;
+  startAt: string | number;
+  lastClaimedAt?: string | number;
+  paused?: boolean;
+}
+
+interface StreamCardProps {
+  stream: Stream;
+  role: 'sender' | 'recipient';
+  onAction?: () => void;
+}
+
+export default function StreamCard({ stream, role, onAction }: StreamCardProps) {
   const { accrued, progress } = useStreamAccrual(stream);
   const [loading, setLoading] = useState(false);
   const isSender = role === 'sender';
@@ -67,9 +86,8 @@ export default function StreamCard({ stream, role, onAction }) {
     setLoading(true);
     try {
       const { signWithFreighter } = await import('../../lib/soroban');
-      const { SorobanRpc, TransactionBuilder, Contract, Address, nativeToScVal, BASE_FEE } = await import(
-        '@stellar/stellar-sdk'
-      );
+      const sdk: any = await import('@stellar/stellar-sdk');
+      const { SorobanRpc, TransactionBuilder, Contract, Address, nativeToScVal, BASE_FEE } = sdk;
 
       const NETWORK = process.env.NEXT_PUBLIC_STELLAR_NETWORK || 'testnet';
       const RPC_URL = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
@@ -117,9 +135,8 @@ export default function StreamCard({ stream, role, onAction }) {
     setLoading(true);
     try {
       const { signWithFreighter } = await import('../../lib/soroban');
-      const { SorobanRpc, TransactionBuilder, Contract, Address, nativeToScVal, BASE_FEE } = await import(
-        '@stellar/stellar-sdk'
-      );
+      const sdk: any = await import('@stellar/stellar-sdk');
+      const { SorobanRpc, TransactionBuilder, Contract, Address, nativeToScVal, BASE_FEE } = sdk;
 
       const NETWORK = process.env.NEXT_PUBLIC_STELLAR_NETWORK || 'testnet';
       const RPC_URL = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
@@ -163,7 +180,7 @@ export default function StreamCard({ stream, role, onAction }) {
     }
   };
 
-  const statusColor = {
+  const statusColor: Record<string, string> = {
     Active: 'text-emerald-400 bg-emerald-400/10',
     Paused: 'text-yellow-400 bg-yellow-400/10',
     Completed: 'text-gray-400 bg-gray-400/10',

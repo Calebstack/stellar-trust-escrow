@@ -3,7 +3,7 @@ import { jest } from '@jest/globals';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 const loggerMock = { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() };
-jest.unstable_mockModule('../config/logger.js', () => ({
+jest.unstable_mockModule('../../config/logger.js', () => ({
   createModuleLogger: () => loggerMock,
 }));
 
@@ -94,16 +94,9 @@ describe('streamingIndexer — StreamCreated handler', () => {
 
     const event = makeEvent({ topic: ['str_crt', '1'] });
 
-    // Should not throw
-    await expect(
-      handleStreamCreated(event, {
-        ledger: BigInt(100),
-        ledgerAt: new Date(),
-        txHash: 'tx1',
-        eventIndex: 0,
-        contractId: 'c',
-      }),
-    ).resolves.toBeUndefined();
+    // P2002 is caught in dispatchEvent, not in handleStreamCreated itself —
+    // exercise the actual idempotency path.
+    await expect(dispatchEvent(event)).resolves.toBeUndefined();
   });
 });
 

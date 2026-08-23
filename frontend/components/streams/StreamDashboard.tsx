@@ -5,9 +5,13 @@ import useSWR from 'swr';
 import StreamCard from './StreamCard';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const fetcher = (url) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-export default function StreamDashboard({ userAddress }) {
+interface StreamDashboardProps {
+  userAddress?: string | null;
+}
+
+export default function StreamDashboard({ userAddress }: StreamDashboardProps) {
   const [tab, setTab] = useState('all');
 
   const { data, error, isLoading, mutate } = useSWR(
@@ -16,7 +20,7 @@ export default function StreamDashboard({ userAddress }) {
     { refreshInterval: 15_000 },
   );
 
-  const streams = data?.data || [];
+  const streams: any[] = data?.data || [];
   const sending = streams.filter((s) => s.senderAddress === userAddress);
   const receiving = streams.filter((s) => s.recipientAddress === userAddress);
 

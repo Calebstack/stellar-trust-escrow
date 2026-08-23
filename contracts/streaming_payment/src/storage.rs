@@ -1,4 +1,4 @@
-use soroban_sdk::{Env};
+use soroban_sdk::Env;
 
 use crate::types::{DataKey, Stream};
 

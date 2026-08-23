@@ -11,6 +11,14 @@ import { xdr, scValToNative } from '@stellar/stellar-sdk';
 
 const STREAMING_CONTRACT_ID = process.env.STREAMING_CONTRACT_ID || '';
 
+// Prisma rows carry BigInt for streamId; JSON.stringify can't serialize BigInt
+// natively, so stringify it explicitly before sending, matching the pattern
+// used elsewhere in this codebase (see escrowController.js).
+function serializeStream(stream) {
+  if (!stream) return stream;
+  return { ...stream, streamId: stream.streamId?.toString() };
+}
+
 // ── Read handlers ─────────────────────────────────────────────────────────────
 
 const listStreams = async (req, res) => {
@@ -46,8 +54,9 @@ const listStreams = async (req, res) => {
     });
 
     const hasMore = rows.length > limit;
-    const data = hasMore ? rows.slice(0, limit) : rows;
-    const nextCursor = hasMore ? String(data[data.length - 1].streamId) : null;
+    const rowsPage = hasMore ? rows.slice(0, limit) : rows;
+    const nextCursor = hasMore ? String(rowsPage[rowsPage.length - 1].streamId) : null;
+    const data = rowsPage.map(serializeStream);
 
     res.json({ data, pagination: { limit, nextCursor } });
   } catch (err) {
@@ -68,7 +77,7 @@ const getStream = async (req, res) => {
     });
 
     if (!stream) return res.status(404).json({ error: 'Stream not found' });
-    res.json(stream);
+    res.json(serializeStream(stream));
   } catch (err) {
     if (err.message?.includes('Cannot convert')) {
       return res.status(400).json({ error: 'Invalid stream id' });
