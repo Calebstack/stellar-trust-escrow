@@ -12,7 +12,7 @@ export function useEscrowSocket(escrowId) {
 
   useEffect(() => {
     if (!escrowId) return;
-    const socket = createEscrowSocket(${WS_URL}?escrowId=);
+    const socket = createEscrowSocket(`${WS_URL}?escrowId=${escrowId}`);
 
     const unsub1 = socket.on('connected', ({ isConnected: connected }) => {
       setIsConnected(connected);
@@ -53,5 +53,6 @@ export function useEscrowSocket(escrowId) {
     }
   }, []);
 
-  return { status, latestEvent, isConnected, isOffline, optimisticUpdate };
+  // lastEvent and events aliases for consumers that use the streaming API
+  return { status, latestEvent, lastEvent: latestEvent, events: [], isConnected, isOffline, optimisticUpdate };
 }
