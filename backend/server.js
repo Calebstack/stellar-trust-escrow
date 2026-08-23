@@ -83,6 +83,7 @@ import chatRoutes from './api/routes/chatRoutes.js';
 import streamRoutes from './api/routes/streamRoutes.js';
 import { startIndexer as startStreamingIndexer } from './services/streamingIndexer.js';
 import { startAnalyticsWorker } from './workers/analyticsWorker.js';
+import { startLedgerBalanceWorker } from './workers/ledgerBalanceWorker.js';
 import { startPriceOracleWorker } from './workers/priceOracleWorker.js';
 
 // Attach Prisma query instrumentation (metrics + traces)
@@ -375,6 +376,12 @@ async function startServer() {
 
         startAnalyticsWorker();
         logger.info('[Analytics] Worker + cron started');
+
+        startLedgerBalanceWorker().catch((err) => {
+          logger.error({ err, component: 'ledger-balance-worker' }, 'Ledger balance worker failed to start');
+          Sentry.captureException(err, { tags: { component: 'ledger-balance-worker' } });
+        });
+        logger.info('[LedgerBalance] Daily invariant-check worker started');
 
         // Reputation ES sync — ensure index + initial sync on startup
         ensureIndex().then(() =>
