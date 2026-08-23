@@ -201,6 +201,13 @@ app.get('/api/csrf-token', generateCsrfToken);
 // Auth is handled by the gateway above — no per-route authMiddleware needed.
 app.use('/api/health', healthRoutes);
 app.use('/ws/health', wsHealthRoutes);
+
+// Root-level liveness endpoint for load balancers / deploy pipelines that
+// expect the conventional /healthz path (e.g. blue-green smoke tests).
+// Deliberately a thin liveness check, not the full dependency check that
+// /api/health/ready does — a slow DB shouldn't fail a smoke-test gate that
+// only wants to know "did the new container start".
+app.get('/healthz', (_req, res) => res.status(200).json({ status: 'ok' }));
 app.use('/api', tenantMiddleware);
 app.use('/api/auth', authRoutes);
 app.use('/api/tenant', tenantRoutes);
