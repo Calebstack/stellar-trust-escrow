@@ -1,35 +1,32 @@
-import { createModuleLogger } from '../config/logger.js';
+import { PrismaClient } from '@prisma/client';
 
-const log = createModuleLogger('service.payment');
+const prisma = new PrismaClient();
 
-async function createCheckoutSession({ address, amountUsd, escrowId }) {
-  log.info({ message: 'payment.createCheckoutSession', address, amountUsd, escrowId });
-  throw new Error('Payment provider not configured');
-}
+const paymentService = {
+  async createCheckoutSession({ address, amountUsd, escrowId }) {
+    const sessionId = `cs_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const payment = await prisma.payment.create({
+      data: { sessionId, address, amountUsd, escrowId, status: 'pending' },
+    });
+    const url = `${process.env.FRONTEND_URL}/pay/${sessionId}`;
+    return { sessionId, url, payment };
+  },
 
-async function getBySessionId(sessionId) {
-  log.info({ message: 'payment.getBySessionId', sessionId });
-  return null;
-}
+  async getBySessionId(sessionId) {
+    return prisma.payment.findUnique({ where: { sessionId } });
+  },
 
-async function getByAddress(address) {
-  log.info({ message: 'payment.getByAddress', address });
-  return [];
-}
+  async getByAddress(address) {
+    return prisma.payment.findMany({ where: { address }, orderBy: { createdAt: 'desc' } });
+  },
 
-async function getById(paymentId) {
-  log.info({ message: 'payment.getById', paymentId });
-  return null;
-}
+  async getById(id) {
+    return prisma.payment.findUnique({ where: { id } });
+  },
 
-async function refund(paymentId) {
-  log.info({ message: 'payment.refund', paymentId });
-  throw new Error('Payment provider not configured');
-}
+  async updateStatus(sessionId, status) {
+    return prisma.payment.update({ where: { sessionId }, data: { status } });
+  },
+};
 
-async function handleWebhook(rawBody, signature) {
-  log.info({ message: 'payment.handleWebhook' });
-  throw new Error('Payment provider not configured');
-}
-
-export default { createCheckoutSession, getBySessionId, getByAddress, getById, refund, handleWebhook };
+export default paymentService;
