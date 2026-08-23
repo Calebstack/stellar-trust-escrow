@@ -17,7 +17,7 @@
     "src"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "node init && tsup src/index.ts --format cjs,esm --dts",
     "generate": "node scripts/generate.js",
     "docs": "typedoc src/index.ts --out docs",
     "test": "jest --config jest.config.js",
