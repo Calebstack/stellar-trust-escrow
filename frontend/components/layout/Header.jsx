@@ -23,6 +23,7 @@ import MobileDrawer from './MobileDrawer';
 import ThemeToggle from './ThemeToggle';
 import CurrencySelector from '../ui/CurrencySelector';
 import NetworkIndicator from './NetworkIndicator';
+import RateTicker from './RateTicker';
 import { cn } from '../../lib/utils';
 
 export default function Header() {
@@ -41,7 +42,7 @@ export default function Header() {
     <header
       className={cn(
         'border-b backdrop-blur-sm sticky top-0 z-50 transition-shadow duration-200',
-        scrolled ? 'shadow-lg' : ''
+        scrolled ? 'shadow-lg' : '',
       )}
       style={{
         borderColor: 'var(--color-border)',
@@ -62,7 +63,10 @@ export default function Header() {
             >
               S
             </div>
-            <span className="font-bold hidden sm:inline" style={{ color: 'var(--color-text-primary)' }}>
+            <span
+              className="font-bold hidden sm:inline"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
               StellarTrust<span style={{ color: 'var(--color-brand)' }}>Escrow</span>
             </span>
           </Link>
@@ -110,6 +114,9 @@ export default function Header() {
             {/* Wallet Status */}
             <WalletStatus wallet={wallet} />
 
+            {/* Live XLM/USD rate */}
+            <RateTicker />
+
             {/* Currency Selector */}
             <CurrencySelector size="sm" />
 
@@ -148,7 +155,10 @@ export default function Header() {
 
         {/* Mobile Nav */}
         {isMobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t flex flex-col gap-4" style={{ borderColor: 'var(--color-border)' }}>
+          <nav
+            className="md:hidden py-4 border-t flex flex-col gap-4"
+            style={{ borderColor: 'var(--color-border)' }}
+          >
             <Link
               href="/dashboard"
               className="transition-colors px-2"
