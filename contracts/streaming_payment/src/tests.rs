@@ -123,7 +123,7 @@ fn test_create_stream_escrows_tokens() {
         &recipient,
         &token,
         100_000_000_000_i128,
-        RATE_PRECISION * 1,
+        RATE_PRECISION,
         1000,
     );
 
@@ -155,7 +155,7 @@ fn test_accrued_returns_zero_before_start_at() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &2000,
     );
 
@@ -180,7 +180,7 @@ fn test_accrued_after_ten_seconds() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -210,7 +210,7 @@ fn test_claim_transfers_correct_amount() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -239,14 +239,8 @@ fn test_cancel_splits_correctly() {
     env.mock_all_auths();
 
     let total = 100_000_000_000_i128;
-    let stream_id = client.create_stream(
-        &sender,
-        &recipient,
-        &token,
-        &total,
-        &(RATE_PRECISION * 1),
-        &1000,
-    );
+    let stream_id =
+        client.create_stream(&sender, &recipient, &token, &total, &RATE_PRECISION, &1000);
 
     env.ledger().with_mut(|li| {
         li.timestamp = 1030;
@@ -285,7 +279,7 @@ fn test_claim_before_start_returns_zero() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &5000,
     );
 
@@ -310,7 +304,7 @@ fn test_pause_stops_accrual() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -344,7 +338,7 @@ fn test_resume_restarts_accrual() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -383,7 +377,7 @@ fn test_cancel_on_completed_stream_is_error() {
         &recipient,
         &token,
         &100_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -416,7 +410,7 @@ fn test_pause_on_already_paused_is_noop() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -448,7 +442,7 @@ fn test_stream_count_increments() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -457,7 +451,7 @@ fn test_stream_count_increments() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
@@ -483,7 +477,7 @@ fn test_multiple_claims_accumulate() {
         &recipient,
         &token,
         &100_000_000_000_i128,
-        &(RATE_PRECISION * 1),
+        &RATE_PRECISION,
         &1000,
     );
 
