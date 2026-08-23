@@ -321,7 +321,11 @@ jobs:
         run: kill "$(cat /tmp/backend-server.pid)" 2>/dev/null || true
 
       - name: Commit security header score history
-        if: steps.changes.outputs.changed == 'true' && matrix.node-version == 22 && steps.security_headers_audit.outcome == 'success' && github.event_name == 'pull_request'
+        # Only same-repo PRs get a GITHUB_TOKEN with push access to the head
+        # branch; forked PRs' default token is read-only and this step would
+        # otherwise fail the whole job with a 403 on every fork contribution.
+        if: steps.changes.outputs.changed == 'true' && matrix.node-version == 22 && steps.security_headers_audit.outcome == 'success' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        continue-on-error: true
         run: |
           if [ -n "$(git status --porcelain backend/security-header-scores.jsonl)" ]; then
             git config user.name "github-actions[bot]"
