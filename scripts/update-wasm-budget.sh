@@ -53,7 +53,7 @@ fi
 
 OPT_WASM="$(mktemp /tmp/"${CONTRACT_NAME}"-update-opt-XXXXXX.wasm)"
 trap 'rm -f "$OPT_WASM"' EXIT
-wasm-opt -Oz "$WASM_CANDIDATE" -o "$OPT_WASM"
+wasm-opt -Oz --enable-bulk-memory "$WASM_CANDIDATE" -o "$OPT_WASM"
 CURRENT_SIZE=$(stat -c%s "$OPT_WASM" 2>/dev/null || stat -f%z "$OPT_WASM")
 
 MAX_ALLOWED=$(( CURRENT_SIZE + (CURRENT_SIZE * MAX_INCREASE_PCT / 100) ))

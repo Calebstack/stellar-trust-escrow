@@ -56,7 +56,10 @@ trap 'rm -f "$OPT_WASM"' EXIT
 
 # -Oz: optimise for size, not speed — matches what actually gets deployed.
 # Raw debug WASM is never compared against the budget.
-wasm-opt -Oz "$WASM_PATH" -o "$OPT_WASM"
+# --enable-bulk-memory: the wasm32-unknown-unknown target emits bulk memory
+# ops (memory.copy/memory.fill) by default on current Rust toolchains, and
+# wasm-opt rejects them as invalid unless this feature is explicitly enabled.
+wasm-opt -Oz --enable-bulk-memory "$WASM_PATH" -o "$OPT_WASM"
 
 ACTUAL_SIZE=$(stat -c%s "$OPT_WASM" 2>/dev/null || stat -f%z "$OPT_WASM")
 
