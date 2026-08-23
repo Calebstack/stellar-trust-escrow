@@ -14,6 +14,7 @@ import userRoutes from '../routes/userRoutes.js';
 import auditRoutes from '../routes/auditRoutes.js';
 import complianceRoutes from '../routes/complianceRoutes.js';
 import flagStatusRoutes from '../routes/flagStatusRoutes.js';
+import contractsRoutes from '../routes/contractsRoutes.js';
 import marketRoutes from '../routes/marketRoutes.js';
 import feeEstimationRoutes from '../routes/feeEstimationRoutes.js';
 
@@ -37,6 +38,7 @@ router.use('/payments', paymentRoutes);
 router.use('/audit', auditRoutes);
 router.use('/compliance', complianceRoutes);
 router.use('/flags', flagStatusRoutes);
+router.use('/contracts', contractsRoutes);
 router.use('/market', marketRoutes);
 router.use('/escrows', feeEstimationRoutes);
 
