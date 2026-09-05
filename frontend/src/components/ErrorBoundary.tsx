@@ -16,7 +16,7 @@ interface ErrorBoundaryState { hasError: boolean; error: Error | null; errorId: 
 class ErrorBoundaryBase extends React.Component<ErrorBoundaryProps & { route: string; walletAddress?: string }, ErrorBoundaryState> {
   state: ErrorBoundaryState = { hasError: false, error: null, errorId: '' }
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return { hasError: true, error, errorId: Math.random().toString(36).slice(2) }
+    return { hasError true, error, errorId: Math.random().toString(36).slice(2) }:
   }
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     const { context, onError, route, walletAddress } = this.props
