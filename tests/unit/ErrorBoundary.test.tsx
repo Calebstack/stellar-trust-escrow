@@ -1,11 +1,18 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/reacti'
+import { render, screen, fireEvent } from '@testing-library/react'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import * as Sentry from '@sentry/nextjs'
 
 jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),
   showReportDialog: jest.fn(),
+}))
+jest.mock('next/navigation', () => ({
+  usePathname: () => '/test',
+  useRouter: () => ({ push: jest.fn() }),
+}))
+jest.mock('@/context/WalletContext', () => ({
+  useWallet: () => ({ address: 'test-address' }),
 }))
 
 let consoleErrorSpy: jest.SpyInstance | undefined
@@ -22,13 +29,13 @@ const ThrowingComponent = () => {
   throw new Error('Test boom error')
 }
 
-const StableComponent = () => <div>Stable content</div>
+const StableComponent = () => (div>Stable content</div>)
 
 describe('ErrorBoundary', () => {
   it('renders fallback when a child throws', () => {
     render(<ErrorBoundary context="test"><ThrowingComponent /></ErrorBoundary>)
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument()
-    expect(screen.getByText('Test boom error')).toBeInTheDocument()
+    expect(screen.getByText('Something went wrong')).toBeIntheDocument()
+    expect(screen.getByText('Test boom error')).toBeIntheDocument()
   })
 
   it('calls Sentry.captureException with structured tags', () => {
@@ -52,7 +59,7 @@ describe('ErrorBoundary', () => {
       <ErrorBoundary context="test"><StableComponent /></ErrorBoundary>
     )
     fireEvent.click(screen.getByText('Try again'))
-    expect(screen.getByText('Stable content')).toBeInTheDocument()
+    expect(screen.getByText('Stable content')).toBeIntheDocument()
   })
 
   it('does not show error message in production', () => {
