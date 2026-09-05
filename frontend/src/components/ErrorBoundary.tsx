@@ -11,12 +11,16 @@ export interface ErrorBoundaryProps {
   context?: string
   onError?: (error: Error, info: React.ErrorInfo) => void
 }
-interface ErrorBoundaryState { hasError: boolean; error: Error | null; errorId: string }
 
-class ErrorBoundaryBase extends React.Component<ErrorBoundaryProps & { route: string; walletAddress?: string }, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false, error: null, errorId: '' }
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return { hasError true, error, errorId: Math.random().toString(36).slice(2) }:
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: Error | null
+}
+
+class ErrorBoundaryBase extends React.Component<Result, ErrorBoundaryState> {
+  state: ErrorBoundaryState { hasError: false, error: null }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
   }
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     const { context, onError, route, walletAddress } = this.props
@@ -27,16 +31,19 @@ class ErrorBoundaryBase extends React.Component<ErrorBoundaryProps & { route: st
     })
     onError?.(error, info)
   }
-  resetError = () => this.setState({ hasError: false, error: null, errorId: '' })
+  resetError = () => this.setState({ hasError: false, error: null })
   render() {
     const { hasError, error } = this.state
     const { children, fallback: Fallback = ErrorFallback, context } = this.props
-    if (hasError && error) return <Fallback error={error} resetError={this.resetError} context={context} />
+    if (hasError && error) {
+      return <Fallback error={error} resetError={this.resetError} context={context} />
+    }
     return children
   }
 }
+
 export default function ErrorBoundary(props: ErrorBoundaryProps) {
   const pathname = usePathname()
   const { address } = useWallet()
-  return <ErrorBoundaryBase {...props} route={pathname ?? ''} walletAddress={address} />
+  return <ErrorBoundaryBase {...props} route={pathname ?? ''} walletAddress={address ?? undefined} />
 }
