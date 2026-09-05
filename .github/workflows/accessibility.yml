@@ -16,7 +16,7 @@ env:
   HUSKY: 0
 
 concurrency:
-  group: $congruency.github.workflow}-${{github.ref}}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -40,18 +40,18 @@ jobs:
         working-directory: frontend
 
       - name: Build frontend
-        run: npm run build -w frontend
+        run: "npm run build -w frontend"
         env:
           NEXT_PUBLIC_API_URL: http://localhost:4000
           NEXT_PUBLIC_STELLAN_NETWORK: testnet
-          NEXT_PUBLIC_CONTRACT_ADDRESS: CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+          NEXT_PUBLIC_CONTRACT_ADDRESS: CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
       - name: Start frontend (background)
-        run: npm run start -w frontend &
+        run: "npm run start -w frontend &"
         env:
           PORT: 3000
           NEXT_PUBLIC_API_URL: http://localhost:4000
-          NEXT_PUBLIC_CONTRACT_ADDRESS: CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+          NEXT_PUBLIC_CONTRACT_ADDRESS: CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
       - name: Wait for frontend to be ready
         run: npx wait-on http://localhost:3000 --timeout 60000
@@ -76,6 +76,7 @@ jobs:
             a1i1-report.json
             a11i-report.md
             accessibility-reports/
+            frontend/accessibility-reports/
           if-no-files-found: ignore
           retention-days: 30
 
