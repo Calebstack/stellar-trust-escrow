@@ -1,15 +1,12 @@
 'use client'
-import React from 'react'
-import * as Sentry from '@sentry/nextjs'
-import ErrorFallback, { FallbackProps } from './ErrorFallback'
-import { usePathname } from 'next/navigation'
-import { useWallet } from '@/context/WalletContext'
 
-export interface ErrorBoundaryProps {
-  children: React.ReactNode
-  fallback?: React.ComponentType<FallbackProps>
+import { Component, ErrorInfo, ReactNode } from 'react'
+import * as Sentry from '@sentry/nextjs'
+import ErrorFallback from './ErrorFallback'
+
+interface ErrorBoundaryProps {
+  children: ReactNode
   context?: string
-  onError?: (error: Error, info: React.ErrorInfo) => void
 }
 
 interface ErrorBoundaryState {
@@ -17,33 +14,39 @@ interface ErrorBoundaryState {
   error: Error | null
 }
 
-class ErrorBoundaryBase extends React.Component<Result, ErrorBoundaryState> {
-  state: ErrorBoundaryState { hasError: false, error: null }
-  static getDerivedStateFromError(error: Error) {
+export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error }
   }
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
-    const { context, onError, route, walletAddress } = this.props
-    Sentry.captureException(error, {
-      tags: { route, context: context ?? 'unknown' },
-      user: walletAddress ? { stellarAddress: walletAddress } : undefined,
-      extra: { componentStack: info.componentStack },
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    const { context } = this.props
+    Sentry.withScope((scope) => {
+      scope.setTag('boundary', 'route')
+      if (context) {
+        scope.setTag('route', context)
+        scope.setContext('route', { name: context })
+      }
+      scope.setExtra('componentStack', errorInfo.componentStack)
+      Sentry.captureException(error)
     })
-    onError?.(error, info)
   }
-  resetError = () => this.setState({ hasError: false, error: null })
-  render() {
+
+  private handleReset = (): void => {
+    this.setState({ hasError: false, error: null })
+  }
+
+  render(): ReactNode {
     const { hasError, error } = this.state
-    const { children, fallback: Fallback = ErrorFallback, context } = this.props
+    const { children, context } = this.props
     if (hasError && error) {
-      return <Fallback error={error} resetError={this.resetError} context={context} />
+      return <ErrorFallback error={error} resetError={this.handleReset} context={context} />
     }
     return children
   }
-}
-
-export default function ErrorBoundary(props: ErrorBoundaryProps) {
-  const pathname = usePathname()
-  const { address } = useWallet()
-  return <ErrorBoundaryBase {...props} route={pathname ?? ''} walletAddress={address ?? undefined} />
 }
