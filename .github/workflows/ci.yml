@@ -17,6 +17,7 @@ env:
   HUSKY: 0
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   NEXT_PUBLIC_SENTRY_DSN: https://examplePublicKey@o0.ingest.sentry.io/0
+  SENTRY_DSN: https://examplePublicKey@o0.ingest.sentry.io/0
 
 jobs:
   # ─────────────────────────────────────────
