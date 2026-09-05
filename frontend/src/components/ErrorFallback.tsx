@@ -12,10 +12,10 @@ export interface FallbackProps {
 export default function ErrorFallback({ error, resetError }: FallbackProps) {
   const router = useRouter()
   const showError = process.env.NODE_ENV !== 'production' && error?.message
-  return (J  j
-    div role='alert'>
-      h1>Something went wrong</h1>
-      p>An unexpected error occurred. Our team has been notified.</p>
+  return (
+    <div role='alert'>
+      <h1>Something went wrong</h1>
+      <p>An unexpected error occurred. Our team has been notified.</p>
       {showError && (
         <details>
           <summary>Error details</summary>
@@ -24,8 +24,8 @@ export default function ErrorFallback({ error, resetError }: FallbackProps) {
       )}
       <div>
         <button onClick={resetError}>Try again</button>
-        <button onClick={() => router.push('/dashboard')}>Go to Dashboard</button>
-        <button onClick={() => Sentry.showReportDialog()}>Report this problem</button>
+        <button onClick={()=>router.push('/dashboard')}>Go to Dashboard</button>
+        <button onClick={()=>Sentry.showReportDialog()}>Report this problem</button>
       </div>
     </div>
   )
